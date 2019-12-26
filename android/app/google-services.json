@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "522265562856",
+    "firebase_url": "https://photogram-f8518.firebaseio.com",
+    "project_id": "photogram-f8518",
+    "storage_bucket": "photogram-f8518.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522265562856:android:c51ac4f7adfca28dfa435d",
+        "android_client_info": {
+          "package_name": "com.example.photogram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "522265562856-pv2tg8n2vcu7ior3jtd9gvgmin8b637a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFt30SBxIQ7nvGP_3ujgEy5CD5C2cI6iM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "522265562856-pv2tg8n2vcu7ior3jtd9gvgmin8b637a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
