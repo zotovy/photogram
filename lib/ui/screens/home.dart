@@ -1,6 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:photogram/ui/screens/notification.dart';
+import 'package:photogram/ui/screens/profile.dart';
+import 'package:photogram/ui/screens/search.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,16 +14,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _currentPage = 1;
   List<Widget> _pages;
   bool _showCreateButton = true;
+  PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     _pages = [
       _homePage(),
-      _searchPage(),
-      _notificationPage(),
-      _profilePage(),
+      SearchScreen(),
+      NotificationScreen(),
+      ProfileScreen(),
     ];
+    _pageController = PageController();
   }
 
   Widget _buildStoriesBox() {
@@ -77,24 +82,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _searchPage() {
-    return Center(
-      child: Icon(Icons.card_membership),
-    );
-  }
-
-  Widget _notificationPage() {
-    return Center(
-      child: Icon(Icons.ac_unit),
-    );
-  }
-
-  Widget _profilePage() {
-    return Center(
-      child: Icon(Icons.change_history),
-    );
-  }
-
   Widget _appBar() {
     return AppBar(
       elevation: 0,
@@ -118,6 +105,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
+        index: _currentPage,
         backgroundColor: Colors.transparent,
         animationDuration: Duration(milliseconds: 200),
         items: [
@@ -130,17 +118,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           setState(() {
             _currentPage = index;
           });
+          _pageController.jumpToPage(index);
         },
       ),
       appBar: _appBar(),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: _pages.elementAt(_currentPage),
+      body: PageView(
+        controller: _pageController,
+        children: _pages,
+        onPageChanged: (int index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        backgroundColor: Color(0xFFca2b7e),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [Color(0xFFf48b4a), Color(0xFFca2b7e)],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+            ),
+          ),
+          child: Icon(Icons.add),
+        ),
+        // backgroundColor: Color(0xFFca2b7e),
         onPressed: () => print('pressed'),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
