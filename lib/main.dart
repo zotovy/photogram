@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photogram/ui/screens/feed.dart';
+import 'package:photogram/ui/screens/home.dart';
 
 import 'package:photogram/ui/screens/login.dart';
 import 'package:photogram/ui/screens/signup.dart';
@@ -31,7 +32,7 @@ class _MainAppState extends State<MainApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Color(0xFFF48B4A)),
-      home: _getPage(),
+      home: HomePage(),
       routes: {
         LoginPage.id: (context) => LoginPage(),
         SignupPage.id: (context) => SignupPage(),
