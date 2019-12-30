@@ -26,9 +26,17 @@ dependencies:
   firebase_core: ^0.4.3+1
   firebase_analytics: ^5.0.9
   firebase_auth: ^0.15.3
+  firebase_storage: ^3.1.0
   cloud_firestore: ^0.13.0+1
   material_design_icons_flutter: 3.4.4795
   curved_navigation_bar: ^0.3.1
+  image_picker: ^0.6.2+3
+  image_cropper: ^1.1.2
+  cached_network_image: ^2.0.0-rc
+  flutter_image_compress: ^0.6.3
+  path_provider: ^1.5.1
+  uuid: ^2.0.4
+  floating_search_bar: ^0.2.0
 
 dev_dependencies:
   flutter_test:

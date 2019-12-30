@@ -6,6 +6,11 @@ import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
 
 class HomePage extends StatefulWidget {
+  static final String id = 'home_page';
+  final String userId;
+
+  HomePage({this.userId});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -13,7 +18,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _currentPage = 1;
   List<Widget> _pages;
-  bool _showCreateButton = true;
   PageController _pageController;
 
   @override
@@ -23,7 +27,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       _homePage(),
       SearchScreen(),
       NotificationScreen(),
-      ProfileScreen(),
+      ProfileScreen(userId: widget.userId),
     ];
     _pageController = PageController();
   }
@@ -121,7 +125,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           _pageController.jumpToPage(index);
         },
       ),
-      appBar: _appBar(),
+      // appBar: _appBar(),
       body: PageView(
         controller: _pageController,
         children: _pages,

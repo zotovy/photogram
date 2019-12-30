@@ -87,6 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                   if (_key.currentState.validate()) {
                     _key.currentState.save();
                     AuthService.login(_email, _password, _scaffoldKey);
+                    Navigator.pushNamed(context, 'home_page');
                   }
                 },
                 child: Padding(

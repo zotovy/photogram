@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:photogram/ui/screens/feed.dart';
+import 'package:photogram/ui/screens/editProfile.dart';
 import 'package:photogram/ui/screens/home.dart';
 
 import 'package:photogram/ui/screens/login.dart';
+import 'package:photogram/ui/screens/search_action.dart';
 import 'package:photogram/ui/screens/signup.dart';
 
 void main() => runApp(MainApp());
@@ -19,7 +20,7 @@ class _MainAppState extends State<MainApp> {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (BuildContext context, snapshot) {
         if (snapshot.hasData) {
-          return FeedPage();
+          return HomePage(userId: snapshot.data.uid);
         } else {
           return LoginPage();
         }
@@ -31,12 +32,15 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primaryColor: Color(0xFFF48B4A)),
-      home: HomePage(),
+      theme: ThemeData(
+          primaryColor: Color(0xFFF48B4A), accentColor: Colors.blueAccent),
+      home: _getPage(),
       routes: {
         LoginPage.id: (context) => LoginPage(),
         SignupPage.id: (context) => SignupPage(),
-        FeedPage.id: (context) => FeedPage(),
+        HomePage.id: (context) => HomePage(),
+        EditProfilePage.id: (context) => EditProfilePage(),
+        SearchActionPage.id: (context) => SearchActionPage(),
       },
     );
   }

@@ -6,8 +6,13 @@ class AuthService {
   static final _auth = FirebaseAuth.instance;
   static final _firestore = Firestore.instance;
 
-  static dynamic signUpUser(BuildContext context, String name, String email,
-      String password, GlobalKey<ScaffoldState> scaffoldKey) async {
+  static dynamic signUpUser(
+      BuildContext context,
+      String name,
+      String email,
+      String _username,
+      String password,
+      GlobalKey<ScaffoldState> scaffoldKey) async {
     try {
       AuthResult authResult = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -19,12 +24,13 @@ class AuthService {
           'name': name,
           'email': email,
           'profileImageUrl': '',
+          'username': _username,
         });
-        Navigator.pushReplacementNamed(context, 'feed_page');
+        Navigator.pushReplacementNamed(context, 'home_page');
       }
     } catch (error) {
       String errorMessage;
-      switch (error.code) {
+      switch (error.message) {
         case "ERROR_INVALID_EMAIL":
           errorMessage = "Your email address appears to be malformed.";
           break;
@@ -44,7 +50,7 @@ class AuthService {
           errorMessage = "Signing in with Email and Password is not enabled.";
           break;
         default:
-          errorMessage = "An undefined Error happened.";
+          errorMessage = error.message;
       }
       scaffoldKey.currentState.showSnackBar(
         SnackBar(
