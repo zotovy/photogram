@@ -30,10 +30,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _bioLink;
   String _bio;
 
-  String _page;
-  String _category;
-  String _contactsOptions;
-  String _profileDisplay;
+  // String _page;
+  // String _category;
+  // String _contactsOptions;
+  // String _profileDisplay;
 
   String _email;
   String _phone;
@@ -114,7 +114,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   _displayProfileImage() {
     if (_profileImage == null) {
       if (widget.user.profileImageUrl.isEmpty) {
-        return AssetImage('assets/images/user_placeholder.jpg');
+        return AssetImage('assets/images/user_placeholder_image.jpg');
       } else {
         return CachedNetworkImageProvider(widget.user.profileImageUrl);
       }
@@ -124,12 +124,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _submit() async {
-    setState(() {
-      _isLoading = true;
-    });
     if (mainFormKey.currentState.validate() &&
         profileInfoFormKey.currentState.validate() &&
         contactFormKey.currentState.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       mainFormKey.currentState.save();
       profileInfoFormKey.currentState.save();
       contactFormKey.currentState.save();
@@ -229,8 +229,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                validator: (value) =>
-                    value.trim().length < 1 ? 'This field is required' : null,
+                validator: (value) => null,
                 onSaved: (value) => _bioLink = value,
               ),
             ),
@@ -248,9 +247,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 validator: (value) =>
-                    value.trim().length < 1 || value.length > 150
-                        ? 'Please enter valid value'
-                        : null,
+                    value.length > 150 ? 'Please enter valid value' : null,
                 onSaved: (value) => _bio = value,
               ),
             ),
@@ -403,8 +400,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                validator: (value) =>
-                    value.trim().length < 1 ? 'Invalid phone number' : null,
+                validator: (value) => null,
                 onSaved: (value) => _phone = value,
               ),
             ),
@@ -421,8 +417,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                validator: (value) =>
-                    value.trim().length < 1 ? 'Invalid value' : null,
+                validator: (value) => null,
                 onSaved: (value) => _gender = value,
               ),
             ),

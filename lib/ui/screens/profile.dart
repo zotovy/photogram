@@ -15,27 +15,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  AppBar _appBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      centerTitle: true,
-      title: Text('lil__niki_'),
-      leading: GestureDetector(
-        child: Icon(
-          Icons.arrow_back,
-          color: Colors.grey,
-        ),
-      ),
-      actions: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(right: 15),
-          child: Icon(Icons.more_horiz),
-        )
-      ],
-    );
-  }
-
   Widget _buildUI(User user) {
     return ListView(
       children: <Widget>[
@@ -55,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               height: 85,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
@@ -65,18 +44,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontSize: 20,
                     ),
                   ),
-                  Text(
-                    user.profession,
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  Text(
-                    user.bio,
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
-                  ),
-                  Text(
-                    user.bioLink,
-                    style: TextStyle(color: Colors.blueAccent, fontSize: 14),
-                  )
+                  user.profession.isEmpty
+                      ? SizedBox.shrink()
+                      : Text(
+                          user.profession,
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
+                        ),
+                  user.bio.isEmpty
+                      ? SizedBox.shrink()
+                      : Text(
+                          user.bio,
+                          style: TextStyle(color: Colors.black54, fontSize: 14),
+                        ),
+                  user.bioLink.isEmpty
+                      ? SizedBox.shrink()
+                      : Text(
+                          user.bioLink,
+                          style:
+                              TextStyle(color: Colors.blueAccent, fontSize: 14),
+                        )
                 ],
               ),
             ),
@@ -372,6 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.userId);
     return Scaffold(
       body: FutureBuilder(
         future: userRef.document(widget.userId).get(),

@@ -1,15 +1,14 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:photogram/models/userData.dart';
 import 'package:photogram/ui/screens/notification.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   static final String id = 'home_page';
-  final String userId;
-
-  HomePage({this.userId});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -27,7 +26,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       _homePage(),
       SearchScreen(),
       NotificationScreen(),
-      ProfileScreen(userId: widget.userId),
+      ProfileScreen(
+        userId: Provider.of<UserData>(context, listen: false).currentUserId,
+      ),
     ];
     _pageController = PageController();
   }
@@ -86,24 +87,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _appBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      title: Text(
-        'Photogram',
-        style: TextStyle(fontFamily: 'BeautyMountains', fontSize: 24),
-      ),
-      actions: <Widget>[
-        IconButton(
-            icon: Icon(MdiIcons.telegram, color: Colors.black, size: 24),
-            onPressed: () => print('go to direct')),
-        IconButton(
-            icon: Icon(MdiIcons.televisionClean, color: Colors.black, size: 24),
-            onPressed: () => print('go to TV')),
-      ],
-    );
-  }
+  // Widget _appBar() {
+  //   return AppBar(
+  //     elevation: 0,
+  //     backgroundColor: Colors.transparent,
+  //     title: Text(
+  //       'Photogram',
+  //       style: TextStyle(fontFamily: 'BeautyMountains', fontSize: 24),
+  //     ),
+  //     actions: <Widget>[
+  //       IconButton(
+  //           icon: Icon(MdiIcons.telegram, color: Colors.black, size: 24),
+  //           onPressed: () => print('go to direct')),
+  //       IconButton(
+  //           icon: Icon(MdiIcons.televisionClean, color: Colors.black, size: 24),
+  //           onPressed: () => print('go to TV')),
+  //     ],
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +151,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Icon(Icons.add),
         ),
         // backgroundColor: Color(0xFFca2b7e),
-        onPressed: () => print('pressed'),
+        onPressed: () => Navigator.pushNamed(context, 'createPost_page'),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );

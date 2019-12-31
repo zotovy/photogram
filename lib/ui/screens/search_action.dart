@@ -4,6 +4,7 @@ import 'package:floating_search_bar/floating_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/services/database.dart';
+import 'package:photogram/ui/screens/profile.dart';
 
 class SearchActionPage extends StatefulWidget {
   static final String id = 'searchAction_page';
@@ -76,6 +77,14 @@ class _SearchActionPageState extends State<SearchActionPage> {
                     itemBuilder: (BuildContext context, int index) {
                       User user = User.fromDoc(snap.data.documents[index]);
                       return ListTile(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProfileScreen(
+                              userId: user.id,
+                            ),
+                          ),
+                        ),
                         leading: CircleAvatar(
                           backgroundColor: Colors.black12,
                           backgroundImage: user.profileImageUrl.isEmpty
