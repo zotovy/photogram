@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/utilities/constants.dart';
 
@@ -21,5 +22,17 @@ class DatabaseService {
     Future<QuerySnapshot> users =
         userRef.where('name', isGreaterThanOrEqualTo: name).getDocuments();
     return users;
+  }
+
+  static void uploadPost(Post post) {
+    postsRef.document(post.authorId).collection('userPosts').add({
+      'imagesUrl': post.imagesUrl,
+      'description': post.description,
+      'tags': post.tags,
+      'place': post.tags,
+      'likeCount': post.likeCount,
+      'authorId': post.authorId,
+      'timestamp': post.timestamp,
+    });
   }
 }

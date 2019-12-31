@@ -194,7 +194,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 validator: (value) =>
-                    _name.trim().length < 1 ? 'This field is required' : null,
+                    value.trim().length < 1 ? 'This field is required' : null,
                 onSaved: (value) => _name = value,
               ),
             ),

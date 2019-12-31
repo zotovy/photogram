@@ -35,4 +35,19 @@ class StorageService {
     );
     return compessedImage;
   }
+
+  static Future<List<String>> uploadPost(List<File> images) async {
+    List<String> downloadUrls = [];
+    for (var i = 0; i < images.length; i++) {
+      String photoId = Uuid().v4();
+      File compressedImage = await compressImage(photoId, images[i]);
+      StorageUploadTask uploadTask = storageRef
+          .child('images/posts/post_$photoId.jpg')
+          .putFile(compressedImage);
+      StorageTaskSnapshot taskSnap = await uploadTask.onComplete;
+      downloadUrls.add(await taskSnap.ref.getDownloadURL());
+    }
+
+    return downloadUrls;
+  }
 }

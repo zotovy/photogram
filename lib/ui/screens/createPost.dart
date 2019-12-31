@@ -1,9 +1,14 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photogram/models/post.dart';
+import 'package:photogram/models/userData.dart';
+import 'package:photogram/services/database.dart';
+import 'package:photogram/services/storage.dart';
+import 'package:provider/provider.dart';
 
 class CreatePostPage extends StatefulWidget {
   static final String id = 'createPost_page';
@@ -22,13 +27,44 @@ class _CreatePostPageState extends State<CreatePostPage> {
   List<String> _tags = [];
   String _place;
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
     _images = [];
   }
 
-  handleImageFromGallery() async {
+  void _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text('Camera'),
+                  onTap: () {
+                    handleImageFromGallery(ImageSource.camera);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: new Icon(Icons.image),
+                  title: new Text('Gallery'),
+                  onTap: () {
+                    handleImageFromGallery(ImageSource.gallery);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  handleImageFromGallery(ImageSource sourse) async {
     File imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (imageFile != null) {
       File croppedFile = await ImageCropper.cropImage(
@@ -74,7 +110,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     child: IconButton(
                       splashColor: Colors.grey[100],
                       icon: Icon(Icons.add),
-                      onPressed: handleImageFromGallery,
+                      onPressed: () => _settingModalBottomSheet(context),
                     ),
                   ),
                 )
@@ -135,6 +171,50 @@ class _CreatePostPageState extends State<CreatePostPage> {
         },
       ),
     );
+  }
+
+  _submit() async {
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      if (_formKey.currentState.validate()) {
+        if (_images.length == 0) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.redAccent[200],
+              elevation: 0,
+              content: Container(
+                height: 25,
+                child: Center(
+                  child: Text('Please, select at least 1 photo'),
+                ),
+              ),
+            ),
+          );
+        } else {
+          _formKey.currentState.save();
+
+          // Add to DB
+          List<String> imgUrls = await StorageService.uploadPost(_images);
+
+          Post post = Post(
+            imagesUrl: imgUrls,
+            description: _description,
+            tags: _tags,
+            place: _place,
+            likeCount: 0,
+            authorId:
+                Provider.of<UserData>(context, listen: false).currentUserId,
+            timestamp: Timestamp.fromDate(DateTime.now()),
+          );
+
+          DatabaseService.uploadPost(post);
+          Navigator.pop(context);
+        }
+      }
+    }
   }
 
   Widget _buildBody() {
@@ -254,28 +334,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   ),
                 ),
               ),
-              onTap: () {
-                if (_formKey.currentState.validate()) {
-                  if (_images.length == 0) {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.redAccent[200],
-                        elevation: 0,
-                        content: Container(
-                          height: 25,
-                          child: Center(
-                            child: Text('Please, select at least 1 photo'),
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    _formKey.currentState.save();
-                    // Add to DB
-                  }
-                }
-              },
+              onTap: _submit,
             ),
           ],
         ),
@@ -285,26 +344,32 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => _isLoading ? null : Navigator.pop(context),
+          ),
+          centerTitle: true,
+          title: Text('Create new post'),
         ),
-        centerTitle: true,
-        title: Text('Create new post'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10),
-        child: ListView(
-          children: <Widget>[
-            _buildPhotoAddRow(),
-            _buildBody(),
-          ],
-        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10),
+                child: ListView(
+                  children: <Widget>[
+                    _buildPhotoAddRow(),
+                    _buildBody(),
+                  ],
+                ),
+              ),
       ),
     );
   }
