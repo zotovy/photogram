@@ -28,6 +28,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       NotificationScreen(),
       ProfileScreen(
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
+        currentUserId:
+            Provider.of<UserData>(context, listen: false).currentUserId,
       ),
     ];
     _pageController = PageController();

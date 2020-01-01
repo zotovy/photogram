@@ -2,19 +2,194 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photogram/models/user.dart';
+import 'package:photogram/models/userData.dart';
+import 'package:photogram/services/database.dart';
 import 'package:photogram/ui/screens/editProfile.dart';
 import 'package:photogram/utilities/constants.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userId;
+  final String currentUserId;
 
-  ProfileScreen({this.userId});
+  ProfileScreen({this.userId, this.currentUserId});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isFollowing = true;
+  int _followerCounter;
+  int _followingCounter;
+
+  _setupIsFollowing() async {
+    bool answer = await DatabaseService.isFollowing(
+        currentUserId: widget.currentUserId, userId: widget.userId);
+    setState(() {
+      _isFollowing = answer;
+    });
+  }
+
+  _setupFollowing() async {
+    int answer = await DatabaseService.countFollowing(widget.userId);
+    setState(() {
+      _followingCounter = answer;
+    });
+  }
+
+  _setupFollowers() async {
+    int answer = await DatabaseService.countFollowers(widget.userId);
+    setState(() {
+      _followerCounter = answer;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _setupIsFollowing();
+    _setupFollowing();
+    _setupFollowers();
+  }
+
+  _followOrUnfollow() {
+    if (_isFollowing) {
+      // Unfollow
+      DatabaseService.unfollowUser(
+          currentUserId: widget.currentUserId, userId: widget.userId);
+      setState(() {
+        _isFollowing = false;
+        _followerCounter--;
+      });
+    } else {
+      DatabaseService.followUser(
+          currentUserId: widget.currentUserId, userId: widget.userId);
+      setState(() {
+        _isFollowing = true;
+        _followerCounter++;
+      });
+    }
+  }
+
+  Widget _buildFollowButton(User user) {
+    return _isFollowing
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Container(
+              width: double.infinity,
+              height: 50.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(3, 5),
+                    blurRadius: 5,
+                    color: Color.fromARGB(25, 0, 0, 0),
+                  )
+                ],
+                color: Colors.grey,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => print('call dialog'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Following',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(width: 7),
+                      Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Container(
+              width: double.infinity,
+              height: 50.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(3, 5),
+                    blurRadius: 5,
+                    color: Color.fromARGB(25, 0, 0, 0),
+                  )
+                ],
+                gradient: LinearGradient(
+                  colors: [Color(0xFF50c9c3), Color(0xFF50A7C2)],
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _followOrUnfollow,
+                  child: Center(
+                    child: Text(
+                      'Follow',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+  }
+
+  Widget _buildButton(User user) {
+    return user.id == Provider.of<UserData>(context).currentUserId
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Container(
+              width: double.infinity,
+              height: 50.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(3, 5),
+                    blurRadius: 5,
+                    color: Color.fromARGB(25, 0, 0, 0),
+                  )
+                ],
+                gradient: LinearGradient(
+                  colors: [Color(0xFF4F7CE3), Color(0xFF6E72E7)],
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfilePage(user: user),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Edit profile',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        : _buildFollowButton(user);
+  }
+
   Widget _buildUI(User user) {
     return ListView(
       children: <Widget>[
@@ -107,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   children: <Widget>[
                     Text(
-                      '280',
+                      _followerCounter.toString(),
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
@@ -127,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   children: <Widget>[
                     Text(
-                      '407',
+                      _followingCounter.toString(),
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
@@ -154,45 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         SizedBox(height: 25),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Container(
-            width: double.infinity,
-            height: 50.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  offset: Offset(3, 5),
-                  blurRadius: 5,
-                  color: Color.fromARGB(25, 0, 0, 0),
-                )
-              ],
-              gradient: LinearGradient(
-                colors: [Color(0xFF4F7CE3), Color(0xFF6E72E7)],
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-              ),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfilePage(user: user),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'Edit profile',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        _buildButton(user),
         SizedBox(height: 25),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -358,14 +495,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.userId);
     return Scaffold(
       body: FutureBuilder(
         future: userRef.document(widget.userId).get(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
             User user = User.fromDoc(snapshot.data);
-            print(user.username);
             return _buildUI(user);
           } else {
             return Center(child: CircularProgressIndicator());
