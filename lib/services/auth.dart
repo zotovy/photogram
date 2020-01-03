@@ -16,6 +16,7 @@ class AuthService {
       String password,
       GlobalKey<ScaffoldState> scaffoldKey) async {
     try {
+      print(email);
       AuthResult authResult = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,

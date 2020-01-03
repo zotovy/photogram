@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/models/userData.dart';
 import 'package:photogram/services/database.dart';
@@ -22,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isFollowing = true;
   int _followerCounter;
   int _followingCounter;
+  List<Post> _posts = [];
 
   _setupIsFollowing() async {
     bool answer = await DatabaseService.isFollowing(
@@ -44,6 +46,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _followerCounter = answer;
     });
   }
+
+  _setupPosts() async {}
 
   @override
   void initState() {
@@ -414,79 +418,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SizedBox(height: 25),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image(
-                      height: MediaQuery.of(context).size.width - 72,
-                      width: MediaQuery.of(context).size.width - 72,
-                      image: NetworkImage(
-                          'https://instagram.fhrk1-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/s750x750/56887239_274737130147897_1115729614862582493_n.jpg?_nc_ht=instagram.fhrk1-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=ODRiIj2Ad0QAX-jkh-X&oh=b7701356b9a332d2f78ca1c9bf8799fa&oe=5EA5412A'),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image(
-                      height: MediaQuery.of(context).size.width - 72,
-                      width: MediaQuery.of(context).size.width - 72,
-                      image: NetworkImage(
-                          'https://instagram.fhrk1-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/s750x750/72098398_432294131025323_6256807535595697372_n.jpg?_nc_ht=instagram.fhrk1-1.fna.fbcdn.net&_nc_cat=111&_nc_ohc=gd2P3-hS1poAX-_tqzG&oh=7de9875b74e391d8f7474d5a9fa7de92&oe=5E9D5E58'),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image(
-                      height: MediaQuery.of(context).size.width - 72,
-                      width: MediaQuery.of(context).size.width - 72,
-                      image: NetworkImage(
-                          'https://instagram.fhrk1-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/s750x750/73291647_2167673173536721_6008377497148947799_n.jpg?_nc_ht=instagram.fhrk1-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=oPBC5YCUKlEAX85P_j1&oh=9b557ff848e41669832ece6659cd03ac&oe=5EA9F0DD'),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          child: ListView.builder(
+            itemCount: _posts.length,
           ),
         ),
       ],

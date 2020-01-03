@@ -67,7 +67,9 @@ class _SignupPageState extends State<SignupPage> {
                         validator: (value) =>
                             value.contains('@') ? null : 'Invalid email',
                         onSaved: (value) {
-                          _email = value;
+                          setState(() {
+                            _email = value;
+                          });
                         },
                       ),
                     ),
@@ -91,7 +93,9 @@ class _SignupPageState extends State<SignupPage> {
                         validator: (value) =>
                             value.trim().isEmpty ? 'Invalid name' : null,
                         onSaved: (value) {
-                          _name = value;
+                          setState(() {
+                            _name = value;
+                          });
                         },
                       ),
                     ),
@@ -116,7 +120,9 @@ class _SignupPageState extends State<SignupPage> {
                         validator: (value) =>
                             value.trim().isEmpty ? 'Invalid username' : null,
                         onSaved: (value) {
-                          _username = value;
+                          setState(() {
+                            _username = value;
+                          });
                         },
                       ),
                     ),
@@ -143,7 +149,9 @@ class _SignupPageState extends State<SignupPage> {
                         validator: (value) =>
                             value.length < 6 ? 'Invalid password' : null,
                         onSaved: (value) {
-                          _password = value;
+                          setState(() {
+                            _password = value;
+                          });
                         },
                       ),
                     ),
@@ -177,14 +185,12 @@ class _SignupPageState extends State<SignupPage> {
                       );
                     } else {
                       _key.currentState.save();
-                      final message = AuthService.signUpUser(context, _name,
-                          _username, _email, _password, _scaffoldKey);
+                      print(_email);
+                      AuthService.signUpUser(context, _name, _email, _username,
+                          _password, _scaffoldKey);
                       setState(() {
                         _isLoading = false;
                       });
-                      if (message != null) {
-                        print(message);
-                      }
                     }
                   }
                 },

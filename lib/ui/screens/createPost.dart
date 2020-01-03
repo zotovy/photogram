@@ -194,11 +194,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
           );
         } else {
+          print('succesfully validate');
           _formKey.currentState.save();
-
+          print('lets save image');
           // Add to DB
           List<String> imgUrls = await StorageService.uploadPost(_images);
-
+          print('get img url');
           Post post = Post(
             imagesUrl: imgUrls,
             description: _description,
@@ -209,8 +210,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 Provider.of<UserData>(context, listen: false).currentUserId,
             timestamp: Timestamp.fromDate(DateTime.now()),
           );
+          print('create a post');
 
           DatabaseService.uploadPost(post);
+          print('upload!');
           Navigator.pop(context);
         }
       }

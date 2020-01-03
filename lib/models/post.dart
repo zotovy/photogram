@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
   final String id;
-  final List<String> imagesUrl;
+  final List<dynamic> imagesUrl;
   final String description;
-  final List<String> tags;
+  final List<dynamic> tags;
   final String place;
   final int likeCount;
   final String authorId;
@@ -24,7 +24,7 @@ class Post {
   factory Post.fromDoc(DocumentSnapshot doc) {
     return Post(
       id: doc.documentID,
-      imagesUrl: doc['imageUrl'],
+      imagesUrl: doc['imagesUrl'],
       description: doc['description'],
       tags: doc['tags'],
       place: doc['place'],

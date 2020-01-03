@@ -1,7 +1,11 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:photogram/models/post.dart';
 import 'package:photogram/models/userData.dart';
+import 'package:photogram/services/auth.dart';
+import 'package:photogram/services/database.dart';
+import 'package:photogram/ui/screens/feed.dart';
 import 'package:photogram/ui/screens/notification.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
@@ -19,11 +23,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Widget> _pages;
   PageController _pageController;
 
+  // Feed screen
+  List<Post> _posts = [];
+
   @override
   void initState() {
     super.initState();
     _pages = [
-      _homePage(),
+      FeedPage(),
       SearchScreen(),
       NotificationScreen(),
       ProfileScreen(
@@ -57,35 +64,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _homePage() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Row(
-            children: <Widget>[
-              // TODO: Stream builder
-              _buildStoriesBox(),
-              _buildStoriesBox(),
-              _buildStoriesBox(),
-            ],
-          ),
-        ),
-        Container(
-          height: 500,
-          child: ListView.builder(
-            itemCount: 100,
-            itemBuilder: (context, i) {
-              return ListTile(
-                leading: Text('$i'),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -138,6 +116,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           });
         },
       ),
+
       floatingActionButton: FloatingActionButton(
         child: Container(
           width: double.infinity,
