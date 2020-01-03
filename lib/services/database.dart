@@ -121,7 +121,7 @@ class DatabaseService {
     List<User> users = [];
     for (var i = 0; i < snap.documents.length; i++) {
       DocumentSnapshot doc =
-          await userRef.document(snap.documents[i]['id']).get();
+          await userRef.document(snap.documents[i].documentID).get();
       User user = User.fromDoc(doc);
       users.add(user);
     }
