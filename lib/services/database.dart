@@ -98,6 +98,36 @@ class DatabaseService {
     return snap.exists;
   }
 
+  static Future<List<User>> getFollowers(String userId) async {
+    QuerySnapshot snap = await followersRef
+        .document(userId)
+        .collection('userFollowers')
+        .getDocuments();
+    List<User> users = [];
+    for (var i = 0; i < snap.documents.length; i++) {
+      DocumentSnapshot doc =
+          await userRef.document(snap.documents[i].documentID).get();
+      User user = User.fromDoc(doc);
+      users.add(user);
+    }
+    return users;
+  }
+
+  static Future<List<User>> getFollowing(String userId) async {
+    QuerySnapshot snap = await followingRef
+        .document(userId)
+        .collection('userFollowing')
+        .getDocuments();
+    List<User> users = [];
+    for (var i = 0; i < snap.documents.length; i++) {
+      DocumentSnapshot doc =
+          await userRef.document(snap.documents[i]['id']).get();
+      User user = User.fromDoc(doc);
+      users.add(user);
+    }
+    return users;
+  }
+
   static Future<int> countFollowers(String userId) async {
     QuerySnapshot snap = await followersRef
         .document(userId)

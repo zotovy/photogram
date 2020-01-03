@@ -1,15 +1,11 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photogram/models/post.dart';
 import 'package:photogram/models/userData.dart';
-import 'package:photogram/services/auth.dart';
-import 'package:photogram/services/database.dart';
 import 'package:photogram/ui/screens/feed.dart';
 import 'package:photogram/ui/screens/notification.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
-import 'package:photogram/widgets/bottomBar.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,9 +19,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _currentPage = 0;
   List<Widget> _pages;
   PageController _pageController;
-
-  // Feed screen
-  List<Post> _posts = [];
 
   @override
   void initState() {

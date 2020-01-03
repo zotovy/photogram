@@ -6,6 +6,7 @@ import 'package:photogram/models/user.dart';
 import 'package:photogram/models/userData.dart';
 import 'package:photogram/services/database.dart';
 import 'package:photogram/ui/screens/editProfile.dart';
+import 'package:photogram/ui/screens/showFollowers.dart';
 import 'package:photogram/utilities/constants.dart';
 import 'package:photogram/widgets/post.dart';
 import 'package:provider/provider.dart';
@@ -212,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             radius: 50,
             backgroundColor: Colors.black12,
             backgroundImage: user.profileImageUrl.isEmpty
-                ? AssetImage('assets/images/user_placeholder_image.jpg')
+                ? AssetImage('/assets/images/user_placeholder_image.jpg')
                 : CachedNetworkImageProvider(user.profileImageUrl),
           ),
         ),
@@ -290,24 +291,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      _followerCounter.toString(),
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ShowFollowersPage(
+                      userId: user.id,
+                      counFollowers: _followerCounter,
                     ),
-                    SizedBox(height: 5),
-                    Text(
-                      'followers',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300),
-                    )
-                  ],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        _followerCounter.toString(),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'followers',
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300),
+                      )
+                    ],
+                  ),
                 ),
               ),
               Padding(
