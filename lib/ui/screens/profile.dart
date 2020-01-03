@@ -7,6 +7,7 @@ import 'package:photogram/models/userData.dart';
 import 'package:photogram/services/database.dart';
 import 'package:photogram/ui/screens/editProfile.dart';
 import 'package:photogram/utilities/constants.dart';
+import 'package:photogram/widgets/post.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -47,7 +48,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  _setupPosts() async {}
+  _setupPosts() async {
+    List<Post> posts = await DatabaseService.getUserPosts(widget.userId);
+    if (mounted) {
+      setState(() {
+        _posts = posts;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -55,6 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _setupIsFollowing();
     _setupFollowing();
     _setupFollowers();
+    _setupPosts();
   }
 
   _followOrUnfollow() {
@@ -194,60 +203,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : _buildFollowButton(user);
   }
 
-  Widget _buildUI(User user) {
-    return ListView(
+  Widget _buildUpRow(User user) {
+    return Row(
       children: <Widget>[
-        SizedBox(height: 35),
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.black12,
-                backgroundImage: user.profileImageUrl.isEmpty
-                    ? AssetImage('assets/images/user_placeholder_image.jpg')
-                    : CachedNetworkImageProvider(user.profileImageUrl),
-              ),
-            ),
-            Container(
-              height: 85,
-              child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    user.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  user.profession.isEmpty
-                      ? SizedBox.shrink()
-                      : Text(
-                          user.profession,
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                  user.bio.isEmpty
-                      ? SizedBox.shrink()
-                      : Text(
-                          user.bio,
-                          style: TextStyle(color: Colors.black54, fontSize: 14),
-                        ),
-                  user.bioLink.isEmpty
-                      ? SizedBox.shrink()
-                      : Text(
-                          user.bioLink,
-                          style:
-                              TextStyle(color: Colors.blueAccent, fontSize: 14),
-                        )
-                ],
-              ),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.black12,
+            backgroundImage: user.profileImageUrl.isEmpty
+                ? AssetImage('assets/images/user_placeholder_image.jpg')
+                : CachedNetworkImageProvider(user.profileImageUrl),
+          ),
         ),
-        SizedBox(height: 25),
+        Container(
+          height: 85,
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                user.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              user.profession.isEmpty
+                  ? SizedBox.shrink()
+                  : Text(
+                      user.profession,
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+              user.bio.isEmpty
+                  ? SizedBox.shrink()
+                  : Text(
+                      user.bio,
+                      style: TextStyle(color: Colors.black54, fontSize: 14),
+                    ),
+              user.bioLink.isEmpty
+                  ? SizedBox.shrink()
+                  : Text(
+                      user.bioLink,
+                      style: TextStyle(color: Colors.blueAccent, fontSize: 14),
+                    )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserInfo(User user) {
+    return Column(
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Container(
@@ -332,97 +341,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
           ),
         ),
-        SizedBox(height: 25),
-        _buildButton(user),
-        SizedBox(height: 25),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(right: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 25,
-                    child: Icon(
-                      MdiIcons.hockeySticks,
-                      color: Colors.white,
-                    ),
-                    // backgroundColor: Colors.grey,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1514511719-9f5849dc16d0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1934&q=80'),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 25,
-                    child: Icon(
-                      MdiIcons.city,
-                      color: Colors.white,
-                    ),
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1514511719-9f5849dc16d0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1934&q=80'),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 3),
-                        blurRadius: 5,
-                        color: Color.fromARGB(35, 0, 0, 0),
-                      )
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    child: Icon(
-                      MdiIcons.artist,
-                      color: Colors.white,
-                    ),
-                    radius: 25,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1558981285-501cd9af9426?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 25),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: ListView.builder(
-            itemCount: _posts.length,
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildPosts(List<Post> posts) {
+    return Column(
+      children: List.generate(posts.length, (int i) {
+        return PostViewWidget(post: posts[i]);
+      }),
+    );
+  }
+
+  Widget _buildUI(User user) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      child: ListView(
+        children: <Widget>[
+          _buildButton(user),
+          SizedBox(height: 25),
+        ],
+      ),
     );
   }
 
@@ -432,9 +372,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: FutureBuilder(
         future: userRef.document(widget.userId).get(),
         builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data != null) {
             User user = User.fromDoc(snapshot.data);
-            return _buildUI(user);
+            return ListView(children: <Widget>[
+              SizedBox(height: 35),
+              _buildUpRow(user),
+              SizedBox(height: 25),
+              _buildUserInfo(user),
+              SizedBox(height: 25),
+              _buildButton(user),
+              SizedBox(height: 25),
+              _buildPosts(_posts),
+            ]);
           } else {
             return Center(child: CircularProgressIndicator());
           }

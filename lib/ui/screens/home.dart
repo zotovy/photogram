@@ -9,6 +9,7 @@ import 'package:photogram/ui/screens/feed.dart';
 import 'package:photogram/ui/screens/notification.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
+import 'package:photogram/widgets/bottomBar.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  int _currentPage = 1;
+  int _currentPage = 0;
   List<Widget> _pages;
   PageController _pageController;
 
@@ -86,25 +87,64 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //   );
   // }
 
+  // CurvedNavigationBar(
+  //       index: _currentPage,
+  //       backgroundColor: Colors.transparent,
+  //       animationDuration: Duration(milliseconds: 200),
+  //       items: [
+  //         Icon(MdiIcons.home),
+  //         Icon(Icons.search),
+  //         Icon(MdiIcons.heart),
+  //         Icon(Icons.person),
+  //       ],
+  //       onTap: (index) {
+  //         setState(() {
+  //           _currentPage = index;
+  //         });
+  //         _pageController.jumpToPage(index);
+  //       },
+  //     ),
+
   @override
   Widget build(BuildContext context) {
+    setState(() {});
     return Scaffold(
-      bottomNavigationBar: CurvedNavigationBar(
-        index: _currentPage,
-        backgroundColor: Colors.transparent,
-        animationDuration: Duration(milliseconds: 200),
-        items: [
-          Icon(MdiIcons.home),
-          Icon(Icons.search),
-          Icon(MdiIcons.heart),
-          Icon(Icons.person),
-        ],
-        onTap: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-          _pageController.jumpToPage(index);
-        },
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            IconButton(
+              onPressed: () => setState(() {
+                _currentPage = 0;
+                _pageController.jumpToPage(_currentPage);
+              }),
+              icon: Icon(MdiIcons.home),
+              color: _currentPage == 0 ? Colors.black : Colors.black26,
+            ),
+            IconButton(
+                onPressed: () => setState(() {
+                      _currentPage = 1;
+                      _pageController.jumpToPage(_currentPage);
+                    }),
+                icon: Icon(Icons.search),
+                color: _currentPage == 1 ? Colors.black : Colors.black26),
+            IconButton(
+                onPressed: () => setState(() {
+                      _currentPage = 2;
+                      _pageController.jumpToPage(_currentPage);
+                    }),
+                icon: Icon(MdiIcons.heart),
+                color: _currentPage == 2 ? Colors.black : Colors.black26),
+            IconButton(
+                onPressed: () => setState(() {
+                      _currentPage = 3;
+                      _pageController.jumpToPage(_currentPage);
+                    }),
+                icon: Icon(Icons.person),
+                color: _currentPage == 3 ? Colors.black : Colors.black26),
+          ],
+        ),
       ),
       // appBar: _appBar(),
       body: PageView(
@@ -119,8 +159,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       floatingActionButton: FloatingActionButton(
         child: Container(
-          width: double.infinity,
-          height: double.infinity,
+          width: 56,
+          height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(

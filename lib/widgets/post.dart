@@ -11,9 +11,8 @@ import 'package:provider/provider.dart';
 
 class PostViewWidget extends StatefulWidget {
   final Post post;
-  final currentUserId;
 
-  PostViewWidget({this.post, this.currentUserId});
+  PostViewWidget({this.post});
 
   @override
   _PostViewWidgetState createState() => _PostViewWidgetState();

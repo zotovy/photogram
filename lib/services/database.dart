@@ -37,6 +37,16 @@ class DatabaseService {
     });
   }
 
+  static Future<List<Post>> getUserPosts(String userId) async {
+    QuerySnapshot snap = await postsRef
+        .document(userId)
+        .collection('userPosts')
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+    List<Post> posts = snap.documents.map((doc) => Post.fromDoc(doc)).toList();
+    return posts;
+  }
+
   static void followUser({String currentUserId, String userId}) {
     // Add user to current user's following collection
     followingRef
