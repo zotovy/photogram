@@ -3,6 +3,7 @@ import 'package:photogram/models/comment.dart';
 import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/utilities/constants.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseService {
   static void updateUser(User user) {
@@ -252,12 +253,38 @@ class DatabaseService {
     return snapshot.documents.length;
   }
 
+  static Future<List<Comment>> getCommentsByPostId(String postId) async {
+    QuerySnapshot snap = await commentsRef
+        .document(postId)
+        .collection('comments')
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+
+    return snap.documents.map((doc) => Comment.fromDoc(doc)).toList();
+  }
+
+  static Future<List<User>> getCommentsAuthorByPostId(String postId) async {
+    QuerySnapshot snap = await commentsRef
+        .document(postId)
+        .collection('comments')
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+    List<User> users = [];
+    for (var i = 0; i < snap.documents.length; i++) {
+      DocumentSnapshot doc =
+          await userRef.document(snap.documents[i]['authorId']).get();
+      User user = User.fromDoc(doc);
+      users.add(user);
+    }
+    return users;
+  }
+
   static Future<void> createComments(
       {String postId, String userId, Comment comment}) {
     commentsRef
         .document(postId)
         .collection('comments')
-        .document(userId)
+        .document(Uuid().v4())
         .setData(
       {
         'authorId': comment.authorId,
@@ -269,11 +296,11 @@ class DatabaseService {
   }
 
   static Future<void> deleteComment(
-      {String postId, String userId, String commentId}) {
+      {String postId, String id, String commentId}) {
     commentsRef
         .document(postId)
         .collection('comments')
-        .document(userId)
+        .document(id)
         .get()
         .then((doc) {
       if (doc.exists) {

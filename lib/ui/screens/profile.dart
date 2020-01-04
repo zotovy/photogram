@@ -221,7 +221,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Container(
           height: 85,
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
@@ -396,21 +395,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: FutureBuilder(
         future: userRef.document(widget.userId).get(),
         builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            User user = User.fromDoc(snapshot.data);
-            return ListView(children: <Widget>[
-              SizedBox(height: 35),
-              _buildUpRow(user),
-              SizedBox(height: 25),
-              _buildUserInfo(user),
-              SizedBox(height: 25),
-              _buildButton(user),
-              SizedBox(height: 25),
-              _buildPosts(_posts),
-            ]);
-          } else {
-            return Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData && snapshot.data != null) {
+              User user = User.fromDoc(snapshot.data);
+              return ListView(children: <Widget>[
+                SizedBox(height: 35),
+                _buildUpRow(user),
+                SizedBox(height: 25),
+                _buildUserInfo(user),
+                SizedBox(height: 25),
+                _buildButton(user),
+                SizedBox(height: 25),
+                _buildPosts(_posts),
+              ]);
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
           }
+          return SizedBox.shrink();
         },
       ),
     );

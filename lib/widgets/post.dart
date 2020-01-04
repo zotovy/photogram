@@ -7,6 +7,7 @@ import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/models/userData.dart';
 import 'package:photogram/services/database.dart';
+import 'package:photogram/ui/screens/detailPost.dart';
 import 'package:provider/provider.dart';
 
 class PostViewWidget extends StatefulWidget {
@@ -20,9 +21,19 @@ class PostViewWidget extends StatefulWidget {
 
 class _PostViewWidgetState extends State<PostViewWidget> {
   int _likeCount = 0;
+  int _commentCount = 0;
   bool _isLiked = false;
   bool _isFav = false;
   User _user;
+
+  _initCommentCount() async {
+    int commentCount = await DatabaseService.countComments(widget.post.id);
+    if (mounted) {
+      setState(() {
+        _commentCount = commentCount;
+      });
+    }
+  }
 
   _initPostLiked() async {
     bool isLiked = await DatabaseService.isLikedPost(
@@ -64,6 +75,7 @@ class _PostViewWidgetState extends State<PostViewWidget> {
     _initPostLiked();
     _initPost();
     _initIsFav();
+    _initCommentCount();
   }
 
   _likePost() {
@@ -169,62 +181,71 @@ class _PostViewWidgetState extends State<PostViewWidget> {
                   ),
                 ],
               )),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            width: MediaQuery.of(context).size.width - 56,
-            height: MediaQuery.of(context).size.width - 56,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              image: widget.post.imagesUrl.length == 1
-                  ? DecorationImage(
-                      image:
-                          CachedNetworkImageProvider(widget.post.imagesUrl[0]),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  offset: Offset(1, 5),
-                  blurRadius: 7,
-                  color: Colors.black26,
-                ),
-              ],
+          GestureDetector(
+            onDoubleTap: _likePost,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DetailPostPage(post: widget.post),
+              ),
             ),
-            child: widget.post.imagesUrl.length == 1
-                ? null
-                : PageView.builder(
-                    itemCount: widget.post.imagesUrl.length,
-                    itemBuilder: (BuildContext context, int i) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width - 56,
-                        height: MediaQuery.of(context).size.width - 56,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                widget.post.imagesUrl[i]),
-                            fit: BoxFit.cover,
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              width: MediaQuery.of(context).size.width - 56,
+              height: MediaQuery.of(context).size.width - 56,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: widget.post.imagesUrl.length == 1
+                    ? DecorationImage(
+                        image: CachedNetworkImageProvider(
+                            widget.post.imagesUrl[0]),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(1, 5),
+                    blurRadius: 7,
+                    color: Colors.black26,
+                  ),
+                ],
+              ),
+              child: widget.post.imagesUrl.length == 1
+                  ? null
+                  : PageView.builder(
+                      itemCount: widget.post.imagesUrl.length,
+                      itemBuilder: (BuildContext context, int i) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width - 56,
+                          height: MediaQuery.of(context).size.width - 56,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                  widget.post.imagesUrl[i]),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: CircleAvatar(
-                              child: Text(
-                                (i + 1).toString() +
-                                    '/' +
-                                    widget.post.imagesUrl.length.toString(),
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CircleAvatar(
+                                child: Text(
+                                  (i + 1).toString() +
+                                      '/' +
+                                      widget.post.imagesUrl.length.toString(),
+                                ),
+                                backgroundColor: Colors.white,
                               ),
-                              backgroundColor: Colors.white,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,8 +259,20 @@ class _PostViewWidgetState extends State<PostViewWidget> {
                     ),
                     onPressed: _likePost,
                   ),
-                  SizedBox(width: 5),
                   Text(_likeCount.toString()),
+                  IconButton(
+                    icon: Icon(Icons.mode_comment),
+                    color: Colors.black26,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DetailPostPage(
+                          post: widget.post,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Text(_commentCount.toString()),
                 ],
               ),
               IconButton(

@@ -6,6 +6,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photogram/models/user.dart';
+import 'package:photogram/services/auth.dart';
 import 'package:photogram/services/database.dart';
 import 'package:photogram/services/storage.dart';
 
@@ -427,6 +428,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  Widget _logOutButton() {
+    return Container(
+      margin: EdgeInsets.only(right: 28, left: 28, bottom: 15),
+      width: double.infinity,
+      height: 50.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(3, 5),
+            blurRadius: 5,
+            color: Color(0x55F44336),
+          )
+        ],
+        gradient: LinearGradient(
+          colors: [Color(0xFFF44336), Color(0xFFC62828)],
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: AuthService.logout,
+          child: Center(
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBody() {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -435,6 +471,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _mainForm(),
           _profileInfoForm(),
           _contactForm(),
+          _logOutButton()
         ],
       ),
     );
