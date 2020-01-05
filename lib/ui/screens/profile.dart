@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
 import 'package:photogram/models/userData.dart';
@@ -405,24 +404,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: FutureBuilder(
         future: userRef.document(widget.userId).get(),
         builder: (BuildContext context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData && snapshot.data != null) {
-              User user = User.fromDoc(snapshot.data);
-              return ListView(children: <Widget>[
-                SizedBox(height: 35),
-                _buildUpRow(user),
-                SizedBox(height: 25),
-                _buildUserInfo(user),
-                SizedBox(height: 25),
-                _buildButton(user),
-                SizedBox(height: 25),
-                _buildPosts(_posts),
-              ]);
-            } else {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
-            }
+              break;
+            default:
+              if (snapshot.hasError) {
+                return Center(
+                    child: Container(child: Text(snapshot.error.toString())));
+              }
+              User user = User.fromDoc(snapshot.data);
+              return ListView(
+                children: <Widget>[
+                  SizedBox(height: 35),
+                  _buildUpRow(user),
+                  SizedBox(height: 25),
+                  _buildUserInfo(user),
+                  SizedBox(height: 25),
+                  _buildButton(user),
+                  SizedBox(height: 25),
+                  _buildPosts(_posts),
+                ],
+              );
           }
-          return Center(child: CircularProgressIndicator());
         },
       ),
     );

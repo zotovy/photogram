@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photogram/models/activity.dart';
 import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
@@ -281,11 +282,31 @@ class _ActivityScreenState extends State<ActivityScreen> {
     );
   }
 
+  Widget _appBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      centerTitle: true,
+      title: Text(
+        'Activity',
+        style: TextStyle(fontSize: 18),
+      ),
+      bottom: PreferredSize(
+        child: Container(
+          color: Colors.black26,
+          height: 1.0,
+        ),
+        preferredSize: Size.fromHeight(1.0),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _appBar(),
       body: FutureBuilder(
-        future: DatabaseService.getAllActivities(' ' + widget.userId),
+        future: DatabaseService.getAllActivities(widget.userId),
         builder: (BuildContext context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());

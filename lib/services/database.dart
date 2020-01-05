@@ -378,8 +378,9 @@ class DatabaseService {
 
     // add activity
     String id = Uuid().v4();
+    print(post.authorId);
     activitiesRef
-        .document(post.id)
+        .document(post.authorId)
         .collection(activitiesTypes.comment)
         .document(id)
         .setData(
