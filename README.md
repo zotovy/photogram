@@ -1,6 +1,8 @@
 # Photogram - Flutter Mobile app
 Do you have Instagram in the future? I decided to revise the usual view of the mobile network for all users and create a photo Frame.
 
+![Preview](https://cdn.freelance.ru/img/portfolio/pics/00/39/F9/3799439.jpg?mt=b17dd2d5)
+
 
 ## Getting Started
 You can download Android version as apk file [here](https://drive.google.com/open?id=1UIy9O2g7y3jg0pvTgzovKnQtvfTrphIL)
@@ -30,3 +32,6 @@ and 10 more...
 * Inst: [@panda.developer](https://www.instagram.com/panda.developer/)
 * GitHub: [pandadevoper](https://github.com/PandaDEVoper)
 * Email: the1ime@yandex.ru
+
+
+![Case](https://cdn.freelance.ru/download/1248651/case.png)
