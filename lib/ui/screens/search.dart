@@ -15,30 +15,31 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Form(
         key: _searchFormKey,
         child: TextFormField(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 15),
-              hoverColor: Colors.blueAccent,
-              suffixIcon: GestureDetector(
-                child: Icon(Icons.search),
-                onTap: () {
-                  if (_searchFormKey.currentState.validate()) {
-                    _searchFormKey.currentState.save();
-                  }
-                },
-              ),
-              hintText: 'Search',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 15),
+            hoverColor: Colors.blueAccent,
+            suffixIcon: GestureDetector(
+              child: Icon(Icons.search),
+              onTap: () {
+                if (_searchFormKey.currentState.validate()) {
+                  _searchFormKey.currentState.save();
+                }
+              },
             ),
-            validator: (value) =>
-                value.trim().length < 1 ? 'Invalid value' : null,
-            onSaved: (value) => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchActionPage(searchText: value),
-                  ),
-                )),
+            hintText: 'Search',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+          validator: (value) =>
+              value.trim().length < 1 ? 'Invalid value' : null,
+          onSaved: (value) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchActionPage(searchText: value),
+            ),
+          ),
+        ),
       ),
     );
   }

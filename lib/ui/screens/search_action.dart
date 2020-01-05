@@ -73,50 +73,53 @@ class _SearchActionPageState extends State<SearchActionPage> {
                     );
                   }
 
-                  return FloatingSearchBar.builder(
-                    controller: _controller,
-                    itemCount: snap.data.documents.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      User user = User.fromDoc(snap.data.documents[index]);
-                      return ListTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProfileScreen(
-                              userId: user.id,
-                              currentUserId:
-                                  Provider.of<UserData>(context, listen: false)
-                                      .currentUserId,
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: FloatingSearchBar.builder(
+                      controller: _controller,
+                      itemCount: snap.data.documents.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        User user = User.fromDoc(snap.data.documents[index]);
+                        return ListTile(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProfileScreen(
+                                userId: user.id,
+                                currentUserId: Provider.of<UserData>(context,
+                                        listen: false)
+                                    .currentUserId,
+                              ),
                             ),
                           ),
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.black12,
+                            backgroundImage: user.profileImageUrl.isEmpty
+                                ? AssetImage(
+                                    'assets/images/user_placeholder_image.jpg')
+                                : CachedNetworkImageProvider(
+                                    user.profileImageUrl),
+                          ),
+                          title: Text(user.username),
+                          subtitle: Text(user.name),
+                        );
+                      },
+                      trailing: Icon(Icons.search),
+                      onChanged: (String value) {
+                        setState(() {
+                          _users = DatabaseService.searchUsers(value);
+                        });
+                      },
+                      onTap: () {},
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 15),
+                        prefixIcon: GestureDetector(
+                          child: Icon(Icons.arrow_back),
+                          onTap: () => Navigator.pop(context),
                         ),
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.black12,
-                          backgroundImage: user.profileImageUrl.isEmpty
-                              ? AssetImage(
-                                  'assets/images/user_placeholder_image.jpg')
-                              : CachedNetworkImageProvider(
-                                  user.profileImageUrl),
-                        ),
-                        title: Text(user.username),
-                        subtitle: Text(user.name),
-                      );
-                    },
-                    trailing: Icon(Icons.search),
-                    onChanged: (String value) {
-                      setState(() {
-                        _users = DatabaseService.searchUsers(value);
-                      });
-                    },
-                    onTap: () {},
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 15),
-                      prefixIcon: GestureDetector(
-                        child: Icon(Icons.arrow_back),
-                        onTap: () => Navigator.pop(context),
+                        hintText: "Search",
                       ),
-                      hintText: "Search",
                     ),
                   );
                 },

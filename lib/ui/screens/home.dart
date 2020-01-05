@@ -5,6 +5,7 @@ import 'package:photogram/ui/screens/feed.dart';
 import 'package:photogram/ui/screens/activity.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
+import 'package:photogram/ui/screens/search_action.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +25,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     _pages = [
       FeedPage(),
-      SearchScreen(),
+      SearchActionPage(searchText: ''),
       ActivityScreen(
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
       ),
@@ -62,46 +63,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  // Widget _appBar() {
-  //   return AppBar(
-  //     elevation: 0,
-  //     backgroundColor: Colors.transparent,
-  //     title: Text(
-  //       'Photogram',
-  //       style: TextStyle(fontFamily: 'BeautyMountains', fontSize: 24),
-  //     ),
-  //     actions: <Widget>[
-  //       IconButton(
-  //           icon: Icon(MdiIcons.telegram, color: Colors.black, size: 24),
-  //           onPressed: () => print('go to direct')),
-  //       IconButton(
-  //           icon: Icon(MdiIcons.televisionClean, color: Colors.black, size: 24),
-  //           onPressed: () => print('go to TV')),
-  //     ],
-  //   );
-  // }
-
-  // CurvedNavigationBar(
-  //       index: _currentPage,
-  //       backgroundColor: Colors.transparent,
-  //       animationDuration: Duration(milliseconds: 200),
-  //       items: [
-  //         Icon(MdiIcons.home),
-  //         Icon(Icons.search),
-  //         Icon(MdiIcons.heart),
-  //         Icon(Icons.person),
-  //       ],
-  //       onTap: (index) {
-  //         setState(() {
-  //           _currentPage = index;
-  //         });
-  //         _pageController.jumpToPage(index);
-  //       },
-  //     ),
-
   @override
   Widget build(BuildContext context) {
-    setState(() {});
     return Scaffold(
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
