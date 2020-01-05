@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photogram/models/activity.dart';
 import 'package:photogram/models/comment.dart';
 import 'package:photogram/models/post.dart';
 import 'package:photogram/models/user.dart';
@@ -48,6 +49,20 @@ class DatabaseService {
     return posts;
   }
 
+  static Future<Post> getPostById({String postId, String authorId}) async {
+    DocumentSnapshot snap = await postsRef
+        .document(authorId)
+        .collection('userPosts')
+        .document(postId)
+        .get();
+
+    if (snap.exists) {
+      Post post = Post.fromDoc(snap);
+      return post;
+    }
+    print("Post doesn't exists");
+  }
+
   static void followUser({String currentUserId, String userId}) {
     // Add user to current user's following collection
     followingRef
@@ -61,6 +76,23 @@ class DatabaseService {
         .collection('userFollowers')
         .document(currentUserId)
         .setData({});
+
+    // Add activity
+    String id = Uuid().v4();
+    activitiesRef
+        .document(userId)
+        .collection(activitiesTypes.following)
+        .document(id)
+        .setData(
+      {
+        'accessoryDataId': '',
+        'fromUserId': currentUserId,
+        'text': '',
+        'timestamp': Timestamp.fromDate(DateTime.now()),
+        'toUserId': userId,
+        'type': activitiesTypes.following,
+      },
+    );
   }
 
   static void unfollowUser({String currentUserId, String userId}) {
@@ -85,6 +117,21 @@ class DatabaseService {
         .then((doc) {
       if (doc.exists) {
         doc.reference.delete();
+      }
+    });
+
+    // Delete activity
+    activitiesRef
+        .document(userId)
+        .collection(activitiesTypes.following)
+        .where('fromUserId', isEqualTo: currentUserId)
+        .where('accessoryDataId', isEqualTo: userId)
+        .getDocuments()
+        .then((snap) {
+      if (snap.documents.length != 0) {
+        snap.documents[0].reference.delete();
+      } else {
+        print('No posts found');
       }
     });
   }
@@ -162,7 +209,10 @@ class DatabaseService {
 
   static Future<User> getUserById(String userId) async {
     DocumentSnapshot snapshot = await userRef.document(userId).get();
-    return User.fromDoc(snapshot);
+    if (snapshot.exists) {
+      return User.fromDoc(snapshot);
+    }
+    print("User doen't exists");
   }
 
   static Future<bool> isFavPost({String userId, String postId}) async {
@@ -222,6 +272,23 @@ class DatabaseService {
           .document(userId)
           .setData({});
     });
+
+    // add activity
+    String id = Uuid().v4();
+    activitiesRef
+        .document(post.authorId)
+        .collection(activitiesTypes.liking)
+        .document(id)
+        .setData(
+      {
+        'accessoryDataId': post.id,
+        'fromUserId': userId,
+        'text': '',
+        'timestamp': Timestamp.fromDate(DateTime.now()),
+        'toUserId': post.authorId,
+        'type': activitiesTypes.liking,
+      },
+    );
   }
 
   static Future<void> unlikePost({Post post, String userId}) async {
@@ -242,6 +309,21 @@ class DatabaseService {
           doc.reference.delete();
         }
       });
+    });
+
+    // Delete activity
+    activitiesRef
+        .document(post.authorId)
+        .collection(activitiesTypes.liking)
+        .where('fromUserId', isEqualTo: userId)
+        .where('accessoryDataId', isEqualTo: post.id)
+        .getDocuments()
+        .then((snap) {
+      if (snap.documents.length != 0) {
+        snap.documents[0].reference.delete();
+      } else {
+        print('No posts found');
+      }
     });
   }
 
@@ -280,9 +362,9 @@ class DatabaseService {
   }
 
   static Future<void> createComments(
-      {String postId, String userId, Comment comment}) {
+      {Post post, String userId, Comment comment}) {
     commentsRef
-        .document(postId)
+        .document(post.id)
         .collection('comments')
         .document(Uuid().v4())
         .setData(
@@ -293,43 +375,51 @@ class DatabaseService {
         'timestamp': comment.timestamp,
       },
     );
+
+    // add activity
+    String id = Uuid().v4();
+    activitiesRef
+        .document(post.id)
+        .collection(activitiesTypes.comment)
+        .document(id)
+        .setData(
+      {
+        'accessoryDataId': post.id,
+        'fromUserId': userId,
+        'text': comment.text,
+        'timestamp': Timestamp.fromDate(DateTime.now()),
+        'toUserId': post.authorId,
+        'type': activitiesTypes.comment,
+      },
+    );
   }
 
-  static Future<void> deleteComment(
-      {String postId, String id, String commentId}) {
+  static Future<void> deleteComment({Post post, String commentId}) {
     commentsRef
-        .document(postId)
+        .document(post.id)
         .collection('comments')
-        .document(id)
+        .document(commentId)
         .get()
         .then((doc) {
       if (doc.exists) {
         doc.reference.delete();
       }
     });
-  }
 
-  static void addActivities({String userId, Post post, Comment comment}) async {
-    if (comment != null) {
-      activitiesRef
-          .document(userId)
-          .collection('activity')
-          .document(post.id)
-          .setData(
-        {
-          'authorId': comment.id,
-          'postId': comment.id,
-          'text': comment.text,
-          'timestamp': comment.timestamp,
-        },
-      );
-    } else {
-      activitiesRef
-          .document(userId)
-          .collection('activity')
-          .document(post.id)
-          .setData({});
-    }
+    // Delete activity
+    activitiesRef
+        .document(post.authorId)
+        .collection(activitiesTypes.comment)
+        .where('fromUserId', isEqualTo: post.authorId)
+        .where('accessoryDataId', isEqualTo: post.id)
+        .getDocuments()
+        .then((snap) {
+      if (snap.documents.length != 0) {
+        snap.documents[0].reference.delete();
+      } else {
+        print('No posts found');
+      }
+    });
   }
 
   static Future<int> countLikes({Post post, String authorId}) async {
@@ -339,5 +429,99 @@ class DatabaseService {
         .document(post.id)
         .get();
     return snapshot['likeCount'];
+  }
+
+  static Future<List<Activity>> getAllActivities(String userId) async {
+    List<Activity> activities = [];
+
+    QuerySnapshot likingSnap = await activitiesRef
+        .document(userId)
+        .collection(activitiesTypes.liking)
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+    activities +=
+        likingSnap.documents.map((doc) => Activity.fromDoc(doc)).toList();
+
+    QuerySnapshot followSnap = await activitiesRef
+        .document(userId)
+        .collection(activitiesTypes.following)
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+    activities +=
+        followSnap.documents.map((doc) => Activity.fromDoc(doc)).toList();
+
+    QuerySnapshot commentSnap = await activitiesRef
+        .document(userId)
+        .collection(activitiesTypes.comment)
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+    activities +=
+        commentSnap.documents.map((doc) => Activity.fromDoc(doc)).toList();
+
+    return activities;
+  }
+
+  static void addActivity(Activity activity) async {
+    if (activity.type == activitiesTypes.liking) {
+      addLikeActivity(activity);
+    } else if (activity.type == activitiesTypes.following) {
+      addFollowActivity(activity);
+    } else if (activity.type == activitiesTypes.comment) {
+      addCommentActivity(activity);
+    }
+  }
+
+  static void addCommentActivity(Activity activity) async {
+    String id = Uuid().v4();
+    activitiesRef
+        .document(activity.toUserId)
+        .collection(activitiesTypes.comment)
+        .document(id)
+        .setData(
+      {
+        'type': activitiesTypes.comment,
+        'fromUserId': activity.fromUserId,
+        'toUserId': activity.toUserId,
+        'text': activity.text,
+        'accessoryDataId': activity.accessoryDataId,
+        'timestamp': activity.timestamp,
+      },
+    );
+  }
+
+  static void addFollowActivity(Activity activity) async {
+    String id = Uuid().v4();
+    activitiesRef
+        .document(activity.toUserId)
+        .collection(activitiesTypes.following)
+        .document(id)
+        .setData(
+      {
+        'type': activitiesTypes.following,
+        'fromUserId': activity.fromUserId,
+        'toUserId': activity.toUserId,
+        'text': activity.text,
+        'accessoryDataId': activity.accessoryDataId,
+        'timestamp': activity.timestamp,
+      },
+    );
+  }
+
+  static void addLikeActivity(Activity activity) async {
+    String id = Uuid().v4();
+    activitiesRef
+        .document(activity.toUserId)
+        .collection(activitiesTypes.liking)
+        .document(id)
+        .setData(
+      {
+        'type': activitiesTypes.liking,
+        'fromUserId': activity.fromUserId,
+        'toUserId': activity.toUserId,
+        'text': activity.text,
+        'accessoryDataId': activity.accessoryDataId,
+        'timestamp': activity.timestamp,
+      },
+    );
   }
 }

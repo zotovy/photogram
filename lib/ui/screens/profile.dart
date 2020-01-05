@@ -31,23 +31,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _setupIsFollowing() async {
     bool answer = await DatabaseService.isFollowing(
         currentUserId: widget.currentUserId, userId: widget.userId);
-    setState(() {
-      _isFollowing = answer;
-    });
+    if (mounted) {
+      setState(() {
+        _isFollowing = answer;
+      });
+    }
   }
 
   _setupFollowing() async {
     int answer = await DatabaseService.countFollowing(widget.userId);
-    setState(() {
-      _followingCounter = answer;
-    });
+    if (mounted) {
+      setState(() {
+        _followingCounter = answer;
+      });
+    }
   }
 
   _setupFollowers() async {
     int answer = await DatabaseService.countFollowers(widget.userId);
-    setState(() {
-      _followerCounter = answer;
-    });
+    if (mounted) {
+      setState(() {
+        _followerCounter = answer;
+      });
+    }
   }
 
   _setupPosts() async {
@@ -73,17 +79,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Unfollow
       DatabaseService.unfollowUser(
           currentUserId: widget.currentUserId, userId: widget.userId);
-      setState(() {
-        _isFollowing = false;
-        _followerCounter--;
-      });
+      if (mounted) {
+        setState(() {
+          _isFollowing = false;
+          _followerCounter--;
+        });
+      }
     } else {
       DatabaseService.followUser(
           currentUserId: widget.currentUserId, userId: widget.userId);
-      setState(() {
-        _isFollowing = true;
-        _followerCounter++;
-      });
+      if (mounted) {
+        setState(() {
+          _isFollowing = true;
+          _followerCounter++;
+        });
+      }
     }
   }
 
@@ -412,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return Center(child: CircularProgressIndicator());
             }
           }
-          return SizedBox.shrink();
+          return Center(child: CircularProgressIndicator());
         },
       ),
     );

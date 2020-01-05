@@ -41,6 +41,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
+
   FocusNode _focusNode = FocusNode();
   TextEditingController _textEditingController = TextEditingController();
 
@@ -98,7 +99,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
 
   _initUser() async {
     User user = await DatabaseService.getUserById(
-        Provider.of<UserData>(context).currentUserId);
+        Provider.of<UserData>(context, listen: false).currentUserId);
     if (mounted) {
       setState(() {
         _user = user;
@@ -113,20 +114,24 @@ class _DetailPostPageState extends State<DetailPostPage> {
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
         post: widget.post,
       );
-      setState(() {
-        _isLiked = false;
-        _likeCount -= 1;
-      });
+      if (mounted) {
+        setState(() {
+          _isLiked = false;
+          _likeCount -= 1;
+        });
+      }
     } else {
       // Like Post
       DatabaseService.likePost(
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
         post: widget.post,
       );
-      setState(() {
-        _isLiked = true;
-        _likeCount += 1;
-      });
+      if (mounted) {
+        setState(() {
+          _isLiked = true;
+          _likeCount += 1;
+        });
+      }
     }
   }
 
@@ -137,26 +142,30 @@ class _DetailPostPageState extends State<DetailPostPage> {
     _likeCount = widget.post.likeCount;
     _initAuthor();
     _initIsFav();
+    _initUser();
     _initCommentCount();
     _initComments();
   }
 
   Future<Null> _refresh() async {
-    _initPostLiked();
-    _likeCount = widget.post.likeCount;
-    _initAuthor();
-    _initIsFav();
-    _initCommentCount();
-    _initComments();
+    _scaffoldKey.currentState?.initState();
+    // _initPostLiked();
+    // _likeCount = widget.post.likeCount;
+    // _initAuthor();
+    // _initIsFav();
+    // _initCommentCount();
+    // _initComments();
     return null;
   }
 
   _submit() {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState.validate() && _textEditingController.text != '') {
       _formKey.currentState.save();
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
       Comment comment = Comment(
         id: Uuid().v4(),
         authorId: Provider.of<UserData>(context, listen: false).currentUserId,
@@ -165,7 +174,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
         timestamp: Timestamp.fromDate(DateTime.now()),
       );
       DatabaseService.createComments(
-        postId: widget.post.id,
+        post: widget.post,
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
         comment: comment,
       );
@@ -173,10 +182,17 @@ class _DetailPostPageState extends State<DetailPostPage> {
       FocusScope.of(context).requestFocus(new FocusNode()); //remove focus
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _textEditingController.clear());
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } else {}
+  }
+
+  _deleteComment(Comment comment) {
+    DatabaseService.deleteComment(commentId: comment.id, post: widget.post);
+    _refresh();
   }
 
   Widget _buildImg(Post post) {
@@ -369,18 +385,22 @@ class _DetailPostPageState extends State<DetailPostPage> {
                                 userId: Provider.of<UserData>(context,
                                         listen: false)
                                     .currentUserId);
-                            setState(() {
-                              _isFav = false;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                _isFav = false;
+                              });
+                            }
                           } else {
                             DatabaseService.createFavPost(
                                 postId: widget.post.id,
                                 userId: Provider.of<UserData>(context,
                                         listen: false)
                                     .currentUserId);
-                            setState(() {
-                              _isFav = true;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                _isFav = true;
+                              });
+                            }
                           }
                         },
                       ),
@@ -401,6 +421,15 @@ class _DetailPostPageState extends State<DetailPostPage> {
         user.username,
         style: TextStyle(color: Colors.grey),
       ),
+      trailing: Provider.of<UserData>(context).currentUserId == comment.authorId
+          ? IconButton(
+              icon: Icon(Icons.close),
+              color: Colors.white,
+              onPressed: () {
+                _deleteComment(comment);
+              },
+            )
+          : null,
       subtitle: Text(
         comment.text,
         style: TextStyle(color: Colors.white),
@@ -481,7 +510,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
         child: TextFormField(
           controller: _textEditingController,
           focusNode: _focusNode,
-          validator: (value) => value == '' ? 'Please, enter something' : null,
+          validator: (value) => null,
           onSaved: (value) => _newCommentText = value,
           decoration: InputDecoration(
             prefixIcon: Padding(
@@ -498,7 +527,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
                             'assets/images/user_placeholder_image.jpg',
                           )
                         : CachedNetworkImageProvider(
-                            _author.profileImageUrl,
+                            _user.profileImageUrl,
                           ),
                     fit: BoxFit.cover,
                   ),

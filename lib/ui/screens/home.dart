@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:photogram/models/post.dart';
 import 'package:photogram/models/userData.dart';
 import 'package:photogram/ui/screens/feed.dart';
-import 'package:photogram/ui/screens/notification.dart';
+import 'package:photogram/ui/screens/activity.dart';
 import 'package:photogram/ui/screens/profile.dart';
 import 'package:photogram/ui/screens/search.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +25,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _pages = [
       FeedPage(),
       SearchScreen(),
-      NotificationScreen(),
+      ActivityScreen(
+        userId: Provider.of<UserData>(context, listen: false).currentUserId,
+      ),
       ProfileScreen(
         userId: Provider.of<UserData>(context, listen: false).currentUserId,
         currentUserId:

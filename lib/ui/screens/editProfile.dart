@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -106,9 +107,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
           iosUiSettings: IOSUiSettings(
             minimumAspectRatio: 1.0,
           ));
-      setState(() {
-        _profileImage = croppedFile ?? imageFile;
-      });
+      if (mounted) {
+        setState(() {
+          _profileImage = croppedFile ?? imageFile;
+        });
+      }
     }
   }
 
@@ -128,9 +131,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (mainFormKey.currentState.validate() &&
         profileInfoFormKey.currentState.validate() &&
         contactFormKey.currentState.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
       mainFormKey.currentState.save();
       profileInfoFormKey.currentState.save();
       contactFormKey.currentState.save();
@@ -451,7 +456,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: AuthService.logout,
+          onTap: () {
+            AuthService.logout();
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          },
           child: Center(
             child: Text(
               'Logout',
